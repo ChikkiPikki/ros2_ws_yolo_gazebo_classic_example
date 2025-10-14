@@ -377,12 +377,17 @@ ros2 launch ros_gz_example_bringup diff_drive.launch.py
 ```
 - Open the VNC Web view and see the Gazebo simulation
 - Before running, ensure no other instance of Gazebo is active
+- You can view the active topics using `ros2 topic list` or the `rqt_graph`
 ## rviz2
 - Open Rviz2 by typing `rviz2` in the terminal
 ```bash
 rviz2
 ```
 - You can add various items by topic to view them in the window
+
+> [!Warning] "Playing" before running
+> Make sure to play the Gazebo simulation before observing topics. The below will not work, you will need to click the play button.
+> ![[Pasted image 20251014165654.png]]
 
 ## Editing the simulation environment
 - Inside the template directory, you'll be able to see 4 packages - application, bringup, description, gazebo
@@ -476,25 +481,18 @@ We'll now add a camera to our robot.
 - Example - we'll add an IMU sensor to the robot using plugins and view its output over ROS
 	1. Inside `ros_gz_project_description/model.sdf`, add the following lines of code:
 		```xml
-		<model name="diff_drive">
-		...
-		<link name="imu_link">
-        <pose>0 0 0.5 0 0 0</pose>
-
-        <sensor name="imu_sensor" type="imu">
-          <always_on>true</always_on>
-          <update_rate>50</update_rate>
-          <visualize>true</visualize>
-          <topic>imu</topic>
-        </sensor>
-
-        <plugin filename="libignition-gazebo-imu-system.so"
-                name="ignition::gazebo::systems::Imu"/>
-      </link>
-      ...
-      </model>
+		<sdf version="1.8">
+    <model name='diff_drive'>
+      <link name='chassis'>
+			<sensor name="imu_sensor" type="imu">
+				<always_on>1</always_on>
+				<update_rate>1</update_rate>
+				<visualize>true</visualize>
+				<topic>imu</topic>
+			</sensor>
+			...
 		```
-	2. Now update the ROS-Gazebo bridge configuration file and the following lines:
+	2. Now update the ROS-Gazebo bridge configuration file and the following lines (`ros_gz_example_bridge.yaml):
 		```yaml
 		- gz_topic_name: "/imu"
 		  ros_topic_name: "/imu"
@@ -503,6 +501,43 @@ We'll now add a camera to our robot.
 		  direction: GZ_TO_ROS
 		```
 
+	3. Update the `<world>` tag inside of  `ros_gz_example_gazebo/worlds/diff_drive.sdf` and include the plugin
+		```xml
+		<sdf version="1.8">
+	  <world name="demo">
+		    <plugin filename="libignition-gazebo-imu-system.so"
+	        name="ignition::gazebo::systems::Imu">
+	    </plugin>
+	    ...
+		```
+4. Now type `ros2 topic list`. You should be able to see `/imu`. You can also try typing `ign topic -l` to see available topics being published from Gazebo
+5. You can add the IMU topic inside of Rviz to visualize it
 
 
 - You can also explore more sensors on this link : [Sensors — Gazebo fortress documentation](https://gazebosim.org/docs/fortress/sensors/)
+
+> [!Question] Task - Add camera link
+> Explore available sensors and add camera to the simulation. (Fun fact - AI tools don't give correct changes (I have tried all). You'll have to go through the documentation :) )
+> Steps to update simulation:
+> 1. Add sensor to model
+> 2. Update ROS-Gazebo bridge configuration
+> 3. Update the world tag to include the plugin
+
+
+> [!info] Insight
+> If you publish the camera topic on the same topic as you published the video and run the YOLO node, the algorithm is still performed on it. This is an example of how modular architecture helps development
+
+___
+# Mini project - Lidar based obstacle detection and stopping
+## **Goal**: Keep car moving forward. Stop if an obstacle is detected within 1 meter range in any direction
+
+> [!Info] This project is a codealong!
+> I'll be coding alongside with you guys. 
+> >
+>Control logic of code 
+>1. [ ] Make a custom subscriber and subscribe to the Lidar topic
+>2. [ ] Check the interface of the LaserScan data type.
+>3. [ ] Loop over all provided ranges and their respective angles and check the minimum one
+>4. [ ] Move forward if all ranges are less than 1. Publish to /diff_drive/cmd_vel (you will need to check its interface as well)
+>   Bonus: If all ranges are less than 1, change the /diff_drive/cmd_vel to move in direction of maximum distance 
+
