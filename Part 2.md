@@ -111,7 +111,7 @@ class CompressedVideoPublisher(Node):
         self.timer_period = 1.0 / fps if fps > 0 else 0.03  # ~30 fps fallback
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
-        self.get_logger().info(f"Publishing compressed video '{self.video_path}' on /video_frames/compressed")
+        self.get_logger().info(f"Publishing compressed video '{self.video_path}' on /video_frames")
 
     def timer_callback(self):
         ret, frame = self.cap.read()
