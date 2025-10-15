@@ -91,13 +91,16 @@ from rclpy.node import Node
 from sensor_msgs.msg import CompressedImage
 import cv2
 import time
-
+from ament_index_python.packages import get_package_share_directory
+import os
 class CompressedVideoPublisher(Node):
     def __init__(self):
         super().__init__('compressed_video_publisher')
         self.publisher_ = self.create_publisher(CompressedImage, '/video_frames/compressed', 10)
+        yolo_package_share = get_package_share_directory('yolo_gazebo')
+        
+        self.video_path = os.path.join(yolo_package_share, 'resource', 'ros2_ws_yolo_gazebo_classic_example', 'video.mp4')
 
-        self.video_path = '../resource/ros2_ws_yolo_gazebo_classic_example/video.mp4'
         self.cap = cv2.VideoCapture(self.video_path)
 
         if not self.cap.isOpened():
@@ -146,6 +149,7 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
+
 
 ```
 >yolo_gazebo/image_publisher.py
