@@ -200,7 +200,7 @@ ros2 run yolo_gazebo image_publisher
 ### Install dependencies:
 ```shell
 pip install "numpy<2" opencv-python
-pip instal ultralytics
+pip install ultralytics
 ```
 
 ### New node - yolo_node
