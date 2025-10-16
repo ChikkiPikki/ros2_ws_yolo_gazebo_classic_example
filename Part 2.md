@@ -42,7 +42,11 @@
 ![[Pasted image 20251014095216.png]]
 - run `mkdir src`
 - Run the below command inside of `~/ros2_ws/src`
-> `ros2 pkg create yolo_gazebo --build-type ament_python --node-name yolo_node
+
+```bash
+ros2 pkg create yolo_gazebo --build-type ament_python --node-name yolo_node
+```
+
 - `yolo_gazebo` will be the name of the package.
 - node named `yolo_node` will be automatically created
 ## Understanding folder structure
