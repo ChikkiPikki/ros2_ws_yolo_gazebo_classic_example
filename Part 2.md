@@ -522,8 +522,7 @@ We'll now add a camera to our robot.
 	name="ignition::gazebo::systems::Imu">
 </plugin>
 ```
-4. Now type `ros2 topic list`. You should be able to see `/imu`. You can also try typing `ign topic -l` to see available topics being published from Gazebo
-5. You can add the IMU topic inside of Rviz to visualize it
+4. Rebuild and rerun. Now type `ros2 topic list`. You should be able to see `/imu`. You can also try typing `ign topic -l` to see available topics being published from Gazebo
 
 
 - You can also explore more sensors on this link : [Sensors — Gazebo fortress documentation](https://gazebosim.org/docs/fortress/sensors/)
