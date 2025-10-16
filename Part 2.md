@@ -494,6 +494,7 @@ We'll now add a camera to our robot.
 - The file at `ros_gz_project_template/ros_gz_example_bringup/config/ros_gz_example_bridge.yaml` shows how Ignitions topics are being remapped to compatible ROS topics
 - Example - we'll add an IMU sensor to the robot using plugins and view its output over ROS
 	1. Inside `ros_gz_project_description/model.sdf`, add the following lines of code:
+		
 		```xml
 		<sdf version="1.8">
     <model name='diff_drive'>
@@ -506,7 +507,9 @@ We'll now add a camera to our robot.
 			</sensor>
 			...
 		```
+		
 	2. Now update the ROS-Gazebo bridge configuration file and the following lines (`ros_gz_example_bridge.yaml):
+		
 		```yaml
 		- gz_topic_name: "/imu"
 		  ros_topic_name: "/imu"
@@ -516,6 +519,7 @@ We'll now add a camera to our robot.
 		```
 
 	3. Update the `<world>` tag inside of  `ros_gz_example_gazebo/worlds/diff_drive.sdf` and include the plugin
+		
 		```xml
 		<sdf version="1.8">
 	  <world name="demo">
