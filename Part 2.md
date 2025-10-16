@@ -70,7 +70,7 @@ To test this, run the following commands
 cd ~/ros2_ws # Go to the root workshop directory
 colcon build
 source install/setup.bash # Source all the executable files
-ros2 run yolo_gazebo yolo_node.py
+ros2 run yolo_gazebo yolo_node
 ```
 The expected output should be `Hi from yolo_gazebo`
 
