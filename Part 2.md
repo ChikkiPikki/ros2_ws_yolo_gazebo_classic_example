@@ -88,30 +88,41 @@ git clone https://github.com/ChikkiPikki/ros2_ws_yolo_gazebo_classic_example
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 import cv2
 import time
 from ament_index_python.packages import get_package_share_directory
 import os
-class CompressedVideoPublisher(Node):
+
+
+class VideoPublisher(Node):
     def __init__(self):
-        super().__init__('compressed_video_publisher')
-        self.publisher_ = self.create_publisher(CompressedImage, '/video_frames/compressed', 10)
+        super().__init__('video_publisher')
+
+        # Publisher for raw image frames
+        self.publisher_ = self.create_publisher(Image, '/video_frames', 10)
+        self.bridge = CvBridge()
+
+        # Locate video file inside the package
         yolo_package_share = get_package_share_directory('yolo_gazebo')
-        
-        self.video_path = os.path.join(yolo_package_share, 'resource', 'ros2_ws_yolo_gazebo_classic_example', 'video.mp4')
+        self.video_path = os.path.join(
+            yolo_package_share,
+            'resource',
+            'ros2_ws_yolo_gazebo_classic_example',
+            'video.mp4'
+        )
 
         self.cap = cv2.VideoCapture(self.video_path)
-
         if not self.cap.isOpened():
             self.get_logger().error(f'Cannot open video: {self.video_path}')
             raise RuntimeError("Video not found")
 
         fps = self.cap.get(cv2.CAP_PROP_FPS)
-        self.timer_period = 1.0 / fps if fps > 0 else 0.03  # ~30 fps fallback
+        self.timer_period = 1.0 / fps if fps > 0 else 0.03  # ~30 FPS fallback
         self.timer = self.create_timer(self.timer_period, self.timer_callback)
 
-        self.get_logger().info(f"Publishing compressed video '{self.video_path}' on /video_frames")
+        self.get_logger().info(f"Publishing raw video '{self.video_path}' on /video_frames")
 
     def timer_callback(self):
         ret, frame = self.cap.read()
@@ -120,36 +131,30 @@ class CompressedVideoPublisher(Node):
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
             return
 
-        # Compress frame as JPEG
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]  # 0–100, lower = more compression
-        success, buffer = cv2.imencode('.jpg', frame, encode_param)
-        if not success:
-            self.get_logger().warn("Failed to compress frame")
-            return
-
-        msg = CompressedImage()
+        # Convert OpenCV frame to ROS2 Image message (no compression)
+        msg = self.bridge.cv2_to_imgmsg(frame, encoding='bgr8')
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.format = "jpeg"
-        msg.data = buffer.tobytes()
-
         self.publisher_.publish(msg)
-        self.get_logger().debug('Published a compressed frame')
+
+    def destroy(self):
+        self.cap.release()
+        super().destroy_node()
+
 
 def main(args=None):
     rclpy.init(args=args)
-    node = CompressedVideoPublisher()
+    node = VideoPublisher()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
         node.get_logger().info('Video publisher stopped')
     finally:
-        node.cap.release()
-        node.destroy_node()
+        node.destroy()
         rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()
-
 
 ```
 >yolo_gazebo/image_publisher.py
