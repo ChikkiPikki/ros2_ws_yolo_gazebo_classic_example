@@ -375,7 +375,8 @@ if __name__ == '__main__':
 ```bash
 cd ~/ros2_ws/src
 git clone https://github.com/gazebosim/ros_gz_project_template
-git checkout fortress # for Fortress users
+cd ros_gz_project_template
+git checkout fortress # for Fortress users. For harmonic users, refer the template repository given in the docs
 ```
 - Navigate to the root directory, build the project and source it, then run it
 ```bash
