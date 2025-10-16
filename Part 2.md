@@ -494,9 +494,7 @@ We'll now add a camera to our robot.
 - The file at `ros_gz_project_template/ros_gz_example_bringup/config/ros_gz_example_bridge.yaml` shows how Ignitions topics are being remapped to compatible ROS topics
 - Example - we'll add an IMU sensor to the robot using plugins and view its output over ROS
 	1. Inside `ros_gz_project_description/model.sdf`, add the following lines of code:
-		
-		```xml
-		<sdf version="1.8">
+```xml
     <model name='diff_drive'>
       <link name='chassis'>
 			<sensor name="imu_sensor" type="imu">
@@ -505,29 +503,25 @@ We'll now add a camera to our robot.
 				<visualize>true</visualize>
 				<topic>imu</topic>
 			</sensor>
-			...
-		```
+```
+	
+2. Now update the ROS-Gazebo bridge configuration file and the following lines (`ros_gz_example_bridge.yaml):
 		
-	2. Now update the ROS-Gazebo bridge configuration file and the following lines (`ros_gz_example_bridge.yaml):
-		
-		```yaml
-		- gz_topic_name: "/imu"
-		  ros_topic_name: "/imu"
-		  ros_type_name: "sensor_msgs/msg/Imu"
-		  gz_type_name: "gz.msgs.IMU"
-		  direction: GZ_TO_ROS
-		```
+```yaml
+- gz_topic_name: "/imu"
+  ros_topic_name: "/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+```
 
-	3. Update the `<world>` tag inside of  `ros_gz_example_gazebo/worlds/diff_drive.sdf` and include the plugin
+3. Update the `<world>` tag inside of  `ros_gz_example_gazebo/worlds/diff_drive.sdf` and include the plugin
 		
-		```xml
-		<sdf version="1.8">
-	  <world name="demo">
-		    <plugin filename="libignition-gazebo-imu-system.so"
-	        name="ignition::gazebo::systems::Imu">
-	    </plugin>
-	    ...
-		```
+```xml 
+<plugin filename="libignition-gazebo-imu-system.so"
+	name="ignition::gazebo::systems::Imu">
+</plugin>
+```
 4. Now type `ros2 topic list`. You should be able to see `/imu`. You can also try typing `ign topic -l` to see available topics being published from Gazebo
 5. You can add the IMU topic inside of Rviz to visualize it
 
@@ -558,4 +552,3 @@ ___
 >3. [ ] Loop over all provided ranges and their respective angles and check the minimum one
 >4. [ ] Move forward if all ranges are less than 1. Publish to /diff_drive/cmd_vel (you will need to check its interface as well)
 >   Bonus: If all ranges are less than 1, change the /diff_drive/cmd_vel to move in direction of maximum distance 
-
